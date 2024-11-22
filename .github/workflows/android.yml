@@ -1,6 +1,7 @@
 name: Build Launcher And Libraries
 
 on: workflow_dispatch
+on:
   push:
     branches: [ "main" ]
   pull_request:
