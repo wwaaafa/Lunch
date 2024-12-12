@@ -3,14 +3,16 @@ package com.dudu.watchface.example;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.BatteryManager;
 import android.text.format.DateFormat;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.dudu.wearlauncher.WatchfaceLayoutInflater;
 import com.dudu.wearlauncher.model.WatchFace;
 import com.dudu.wearlauncher.utils.ILog;
+import com.dudu.watchface.example.R;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -28,14 +30,14 @@ public class WatchFaceImpl extends WatchFace {
     private FrameLayout centerLayout;
 
 
-    public WatchFaceImpl(Context context,String path) {
-        super(context, null,path);
+    public WatchFaceImpl(Context context) {
+        super(context);
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void initView() {
-        WatchfaceLayoutInflater.from(getHostContext(), getClass().getClassLoader()).inflate(getResources().getLayout(R.layout.layout_main), this);
+        LayoutInflater.from(getContext()).inflate(R.layout.layout_main, this);
 /*
         setOnClickListener(v->{
             WatchSurfaceHelper.startWsfActivity(getHostContext(),BuildConfig.WATCHFACE_NAME,SettingsSurface.class);
@@ -50,10 +52,10 @@ public class WatchFaceImpl extends WatchFace {
         ivStep = findViewById(R.id.iv_step);
         centerLayout = findViewById(R.id.centerlayout);
 
-        GifView gifView = new GifView(getHostContext());
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(DensityUtil.dip2px(getHostContext(),60),DensityUtil.dip2px(getHostContext(),30));
+        GifView gifView = new GifView(getContext());
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(DensityUtil.dip2px(getContext(),60),DensityUtil.dip2px(getContext(),30));
         layoutParams.gravity = Gravity.CENTER_VERTICAL+Gravity.END;
-        layoutParams.bottomMargin = DensityUtil.dip2px(getHostContext(),36);
+        layoutParams.bottomMargin = DensityUtil.dip2px(getContext(),36);
 
         gifView.setLayoutParams(layoutParams);
 
@@ -65,8 +67,8 @@ public class WatchFaceImpl extends WatchFace {
 
         centerLayout.addView(gifView);
 
-        ivBattery.setBackground(getResources().getDrawable(R.drawable.battery));
-        ivStep.setBackground(getResources().getDrawable(R.drawable.steps));
+        ivBattery.setImageResource(R.drawable.battery);
+        ivStep.setImageResource(R.drawable.steps);
         tvTime.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "fonts/DS-DIGI-1.ttf"));
         tvStep.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "fonts/DS-DIGIB-2.ttf"));
         tvBattery.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "fonts/DS-DIGIB-2.ttf"));
@@ -76,6 +78,11 @@ public class WatchFaceImpl extends WatchFace {
     @Override
     public void updateBattery(int i,int status) {    //此函数在电池数值更新时执行，i是当前电量，status是电池状态
         tvBattery.setText(i+"%");
+        if (status == BatteryManager.BATTERY_STATUS_CHARGING){
+            ivBattery.setImageResource(R.drawable.charging);
+        }else {
+            ivBattery.setImageResource(R.drawable.battery);
+        }
     }
     @Override
     public void updateStep(int i) {    //步数步数更新时调用
@@ -85,7 +92,7 @@ public class WatchFaceImpl extends WatchFace {
     public void updateTime() {    //此函数在时间更新时执行
         int hour;
         Calendar calendar = Calendar.getInstance();
-        if (DateFormat.is24HourFormat(getHostContext())) {
+        if (DateFormat.is24HourFormat(getContext())) {
             hour = calendar.get(11);
         } else {
             hour = calendar.get(10);
